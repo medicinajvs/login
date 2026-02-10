@@ -5,6 +5,7 @@ import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, signOut } from 'firebase/auth';
 import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, serverTimestamp, getDocs, query, orderBy, limit, deleteDoc, increment } from 'firebase/firestore';
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
+import CoursesGridLogoCards from './MeusCursos';
 
 
 // ============================================================================
@@ -1307,45 +1308,21 @@ const Dashboard = ({ authUser, userData, setUserData, userRole, courses }) => {
                 
                 {/* 1. COURSES VIEW */}
                 {currentView === 'courses-view' && (
-                    <div className="w-full">
-                        <div className="mb-6 text-center">
-                            <h2 className="text-2xl font-semibold text-gray-800">Cursos Disponíveis - Medicina JVS</h2>
-                            <p className="text-gray-600">A Plataforma possui {filteredCourses.length} Cursos livres para acesso</p>
-                        </div>
-
-                        {/* Removi o max-w-4xl/max-w-7xl e ajustei o grid para telas grandes */}
-                        <div id="course-grid" className={isGridView ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6" : "grid grid-cols-1 gap-4 w-full"}>
-                            {filteredCourses.map(course => (
-                                <div key={course.id} className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden flex flex-col h-full hover:-translate-y-1 hover:shadow-xl transition-all duration-200" style={{ display: isGridView ? 'flex' : 'flex', flexDirection: isGridView ? 'column' : 'row' }}>
-                                    <div className={`course-image-placeholder w-full aspect-video bg-gray-200 flex items-center justify-center text-gray-500 ${!isGridView ? 'w-64 flex-shrink-0 h-auto' : ''}`}>
-                                        <i className="fa-solid fa-image text-4xl opacity-50"></i>
-                                    </div>
-                                    <div className="p-4 flex flex-col flex-grow">
-                                        <div className="flex justify-between items-center mb-2">
-                                            <span className={`text-xs font-semibold px-2 py-0.5 rounded ${course.tagColor}`}>{course.category}</span>
-                                            <div className="flex items-center space-x-2 text-gray-400">
-                                                <i className="fa-regular fa-clock" title="Duração"></i>
-                                                <button onClick={() => toggleFavorite(course.id)} className="focus:outline-none transform active:scale-90 transition bg-transparent">
-                                                    <i className={`text-lg ${userData.favorites && userData.favorites.includes(course.id) ? 'fa-solid fa-heart text-red-500' : 'fa-regular fa-heart hover:text-red-500'}`}></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <h3 className="font-semibold text-gray-800 mb-2 text-base line-clamp-2">{course.title}</h3>
-                                        {course.driveLink !== '#' && (
-                                            <a href={course.driveLink} target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-gray-600 bg-gray-50 border border-gray-200 hover:bg-gray-100 hover:text-blue-600 rounded px-2 py-1 mb-2 w-fit inline-flex items-center transition-colors">
-                                                <i className="fa-brands fa-google-drive mr-1"></i> Drive
-                                            </a>
-                                        )}
-                                        <p className="text-sm text-gray-600 mb-3 mt-1"><i className="fa-solid fa-user-group mr-1"></i> {course.teachers}</p>
-                                        <button className="mt-auto w-full bg-blue-600 text-white text-sm font-medium py-2 rounded-md hover:bg-blue-700 transition-colors" onClick={() => addToHistory(course)}>Ver Curso</button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
+                    <div id="courses-view" className="w-full animate-fade-in">
+                      <CoursesGridLogoCards
+                        title="Meus Cursos"
+                        subtitle="Cursos disponíveis na Plataforma Medicina JVS."
+                        onOpenCourse={(course) => {
+                          // Ação padrão: abre o Drive do curso (quando liberado)
+                          if (course?.driveUrl) {
+                            window.open(course.driveUrl, '_blank', 'noopener,noreferrer');
+                          }
+                        }}
+                      />
                     </div>
                 )}
 
-                                {/* 2. FLASHCARDS VIEW */}
+                {/* 2. FLASHCARDS VIEW */}
                 {currentView === 'flashcards-view' && (
                   <div id="flashcards-view" className="w-full animate-fade-in">
                     <FlashcardsDashboard
