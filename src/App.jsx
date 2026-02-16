@@ -1,11 +1,1283 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, Link } from 'react-router-dom';
 import Chart from 'chart.js/auto';
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, signOut } from 'firebase/auth';
 import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, serverTimestamp, getDocs, query, orderBy, limit, deleteDoc, increment } from 'firebase/firestore';
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import CoursesGridLogoCards from './MeusCursos';
+
+// Base da pasta de páginas institucionais (Vite: coloque em /public/pages institucional)
+const withBase = (path) => {
+  const base = import.meta.env.BASE_URL || '/';
+  const cleanBase = base.endsWith('/') ? base : base + '/';
+  const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+  return cleanBase + cleanPath;
+};
+
+// Base relativa (sem barra inicial) para páginas institucionais em /public
+const INSTITUTIONAL_BASE = 'pages/institucional';
+function ExternalRedirect({ to, newTab = false }) {
+  useEffect(() => {
+    const url = withBase(to);
+
+    if (newTab) {
+      window.open(url, "_blank", "noopener,noreferrer");
+    } else {
+      window.location.assign(url);
+    }
+  }, [to, newTab]);
+
+  return null;
+}
+
+
+// ✅ Para estas páginas serem EXTERNAS de verdade, coloque os HTMLs em:
+// public/pages/institucional/(politicaPrivacidade.html, termosUso.html, suporte.html, cookies.html)
+// (Arquivos dentro de src/ NÃO são servidos diretamente por URL no Vite.)
+
+
+// ============================================================================
+// 0. PÁGINAS LEGAIS (HTML ACOPLADO)
+//    (geradas a partir dos arquivos .html enviados)
+// ============================================================================
+const LEGAL_HTML = {
+  privacy: `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Política de Privacidade | [Nome da Empresa]</title>
+    <meta name="description" content="Política de Privacidade e Proteção de Dados da [Nome da Empresa].">
+    
+    <!-- Tailwind CSS (via CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Configurações de Fonte (Inter) -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        /* Estilização da barra de rolagem */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Destaque do link ativo no menu lateral */
+        .nav-link.active {
+            color: #2563eb;
+            border-left: 3px solid #2563eb;
+            background-color: #eff6ff;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-700 antialiased">
+
+    <!-- Cabeçalho -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo / Nome da Empresa -->
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="#" class="text-xl font-bold text-slate-900">
+                        <i class="fa-solid fa-shield-halved text-blue-600 mr-2"></i>
+                        [Nome da Empresa]
+                    </a>
+                </div>
+                
+                <!-- Navegação Simples -->
+                <nav class="hidden md:flex space-x-8">
+                    <a href="#" class="text-slate-500 hover:text-blue-600 px-3 py-2 text-sm font-medium">Home</a>
+                    <a href="#" class="text-blue-600 px-3 py-2 text-sm font-medium border-b-2 border-blue-600">Privacidade</a>
+                    <a href="#" class="text-slate-500 hover:text-blue-600 px-3 py-2 text-sm font-medium">Termos de Uso</a>
+                    <a href="#" class="text-slate-500 hover:text-blue-600 px-3 py-2 text-sm font-medium">Contato</a>
+                </nav>
+
+                <!-- Menu Mobile Button (Apenas visual para este exemplo) -->
+                <div class="flex items-center md:hidden">
+                    <button type="button" class="text-slate-500 hover:text-slate-700 focus:outline-none">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Cabeçalho do Documento -->
+    <div class="bg-blue-900 text-white py-12">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold mb-4">Política de Privacidade</h1>
+            <p class="text-blue-200 text-lg">Seu guia sobre como tratamos seus dados pessoais, em conformidade com a LGPD.</p>
+            <p class="mt-4 text-sm text-blue-300">Última atualização: <span id="last-updated"></span></p>
+        </div>
+    </div>
+
+    <!-- Conteúdo Principal -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div class="flex flex-col md:flex-row gap-8">
+            
+            <!-- Menu Lateral (Sticky) -->
+            <aside class="md:w-1/4 hidden md:block">
+                <nav class="sticky top-24 bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="p-4 bg-slate-50 border-b border-slate-200 font-semibold text-slate-800">
+                        Índice
+                    </div>
+                    <ul class="flex flex-col py-2">
+                        <li><a href="#introducao" class="nav-link block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 border-l-3 border-transparent">1. Introdução</a></li>
+                        <li><a href="#coleta" class="nav-link block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 border-l-3 border-transparent">2. Coleta de Dados</a></li>
+                        <li><a href="#uso" class="nav-link block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 border-l-3 border-transparent">3. Uso das Informações</a></li>
+                        <li><a href="#compartilhamento" class="nav-link block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 border-l-3 border-transparent">4. Compartilhamento</a></li>
+                        <li><a href="#cookies" class="nav-link block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 border-l-3 border-transparent">5. Cookies e Tecnologias</a></li>
+                        <li><a href="#seguranca" class="nav-link block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 border-l-3 border-transparent">6. Segurança de Dados</a></li>
+                        <li><a href="#direitos" class="nav-link block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 border-l-3 border-transparent">7. Seus Direitos (LGPD)</a></li>
+                        <li><a href="#contato" class="nav-link block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 border-l-3 border-transparent">8. Contato</a></li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <!-- Texto do Documento -->
+            <article class="md:w-3/4 bg-white p-8 rounded-lg shadow-sm border border-slate-200 leading-relaxed text-justify">
+                
+                <!-- Seção 1 -->
+                <section id="introducao" class="mb-10 scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">1. Introdução</h2>
+                    <p class="mb-4">
+                        A <strong>[Nome da Sua Empresa]</strong> ("nós", "nosso" ou "empresa"), inscrita no CNPJ sob o nº [00.000.000/0001-00], está comprometida em proteger a sua privacidade. Esta Política de Privacidade explica de maneira clara e acessível como coletamos, usamos, armazenamos e protegemos os seus dados pessoais ao utilizar nosso site, aplicativos e serviços.
+                    </p>
+                    <p>
+                        Ao acessar nosso site, você concorda com as práticas descritas nesta política. Este documento foi elaborado em conformidade com a <strong>Lei Geral de Proteção de Dados (Lei nº 13.709/2018 - LGPD)</strong>.
+                    </p>
+                </section>
+
+                <!-- Seção 2 -->
+                <section id="coleta" class="mb-10 scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">2. Coleta de Dados</h2>
+                    <p class="mb-4">Coletamos informações para fornecer melhores serviços a todos os nossos usuários. As informações coletadas incluem:</p>
+                    <ul class="list-disc pl-6 mb-4 space-y-2">
+                        <li><strong>Dados fornecidos por você:</strong> Nome, endereço de e-mail, telefone, CPF e endereço quando você preenche formulários, cria uma conta ou realiza uma compra.</li>
+                        <li><strong>Dados de navegação:</strong> Endereço IP, tipo de navegador, páginas visitadas, tempo gasto em cada página e dados de geolocalização aproximada.</li>
+                        <li><strong>Dados de pagamento:</strong> Ao realizar transações, coletamos dados necessários para processar o pagamento, embora números de cartão de crédito sejam processados diretamente por gateways de pagamento seguros e não sejam armazenados em nossos servidores.</li>
+                    </ul>
+                </section>
+
+                <!-- Seção 3 -->
+                <section id="uso" class="mb-10 scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">3. Uso das Informações</h2>
+                    <p class="mb-4">Utilizamos os dados coletados para diversas finalidades, baseadas nas hipóteses legais da LGPD:</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                        <div class="bg-slate-50 p-4 rounded border border-slate-100">
+                            <h3 class="font-semibold text-blue-800 mb-2">Prestação de Serviços</h3>
+                            <p class="text-sm text-slate-600">Para processar pedidos, entregar produtos e gerenciar sua conta.</p>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded border border-slate-100">
+                            <h3 class="font-semibold text-blue-800 mb-2">Comunicação e Marketing</h3>
+                            <p class="text-sm text-slate-600">Para enviar newsletters, promoções e atualizações sobre pedidos (você pode cancelar a qualquer momento).</p>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded border border-slate-100">
+                            <h3 class="font-semibold text-blue-800 mb-2">Melhoria e Segurança</h3>
+                            <p class="text-sm text-slate-600">Para analisar tendências, administrar o site e prevenir fraudes.</p>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded border border-slate-100">
+                            <h3 class="font-semibold text-blue-800 mb-2">Obrigação Legal</h3>
+                            <p class="text-sm text-slate-600">Para cumprir obrigações legais e regulatórias (ex: emissão de notas fiscais).</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Seção 4 -->
+                <section id="compartilhamento" class="mb-10 scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">4. Compartilhamento de Dados</h2>
+                    <p class="mb-4">Não vendemos seus dados pessoais. Podemos compartilhar suas informações apenas nas seguintes situações:</p>
+                    <ul class="list-disc pl-6 mb-4 space-y-2">
+                        <li><strong>Fornecedores e Parceiros:</strong> Empresas que prestam serviços em nosso nome (ex: transportadoras para entrega, processadores de pagamento, hospedagem de site).</li>
+                        <li><strong>Autoridades Legais:</strong> Quando exigido por lei, ordem judicial ou autoridade governamental competente.</li>
+                    </ul>
+                </section>
+
+                <!-- Seção 5 -->
+                <section id="cookies" class="mb-10 scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">5. Cookies e Tecnologias de Rastreamento</h2>
+                    <p class="mb-4">Utilizamos cookies para melhorar a experiência de navegação. Um cookie é um pequeno arquivo de texto armazenado no seu dispositivo.</p>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white border border-slate-200 mt-4 text-sm">
+                            <thead class="bg-slate-50">
+                                <tr>
+                                    <th class="py-2 px-4 border-b text-left">Tipo de Cookie</th>
+                                    <th class="py-2 px-4 border-b text-left">Finalidade</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="py-2 px-4 border-b font-medium">Essenciais</td>
+                                    <td class="py-2 px-4 border-b">Necessários para o site funcionar (ex: login, carrinho de compras).</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2 px-4 border-b font-medium">Analíticos</td>
+                                    <td class="py-2 px-4 border-b">Coletam dados anônimos sobre como os visitantes usam o site (ex: Google Analytics).</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2 px-4 border-b font-medium">Marketing</td>
+                                    <td class="py-2 px-4 border-b">Rastreiam a navegação para exibir anúncios relevantes.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="mt-4 text-sm text-slate-500">Você pode gerenciar ou desabilitar os cookies nas configurações do seu navegador.</p>
+                </section>
+
+                <!-- Seção 6 -->
+                <section id="seguranca" class="mb-10 scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">6. Segurança de Dados</h2>
+                    <div class="bg-green-50 border-l-4 border-green-500 p-4 mb-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class="fa-solid fa-lock text-green-600"></i>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-green-700">
+                                    Utilizamos criptografia SSL (Secure Socket Layer) para proteger a transmissão de dados e adotamos práticas rigorosas de segurança da informação.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <p>
+                        Apesar de adotarmos as melhores práticas, nenhum método de transmissão pela internet ou armazenamento eletrônico é 100% seguro. Comprometemo-nos a notificar você e as autoridades competentes em caso de qualquer violação de segurança que possa acarretar risco relevante.
+                    </p>
+                </section>
+
+                <!-- Seção 7 -->
+                <section id="direitos" class="mb-10 scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">7. Seus Direitos (LGPD)</h2>
+                    <p class="mb-4">De acordo com a Lei Geral de Proteção de Dados, você tem o direito de:</p>
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <i class="fa-solid fa-check text-blue-500 mt-1 mr-2"></i>
+                            <span>Confirmar a existência de tratamento de dados.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa-solid fa-check text-blue-500 mt-1 mr-2"></i>
+                            <span>Acessar os dados que possuímos sobre você.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa-solid fa-check text-blue-500 mt-1 mr-2"></i>
+                            <span>Corrigir dados incompletos, inexatos ou desatualizados.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa-solid fa-check text-blue-500 mt-1 mr-2"></i>
+                            <span>Solicitar a anonimização, bloqueio ou eliminação de dados desnecessários.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa-solid fa-check text-blue-500 mt-1 mr-2"></i>
+                            <span>Revogar o consentimento a qualquer momento.</span>
+                        </li>
+                    </ul>
+                </section>
+
+                <!-- Seção 8 -->
+                <section id="contato" class="scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">8. Contato e Encarregado de Dados (DPO)</h2>
+                    <p class="mb-6">
+                        Se você tiver dúvidas sobre esta Política de Privacidade ou desejar exercer seus direitos, entre em contato conosco através do nosso Encarregado de Proteção de Dados:
+                    </p>
+                    
+                    <div class="bg-blue-50 rounded-lg p-6 border border-blue-100 text-center md:text-left">
+                        <h3 class="text-lg font-bold text-blue-900 mb-2">[Nome da Sua Empresa]</h3>
+                        <p class="text-blue-800 mb-1"><i class="fa-solid fa-envelope mr-2"></i> <strong>E-mail:</strong> <a href="mailto:privacidade@suaempresa.com" class="underline">privacidade@suaempresa.com</a></p>
+                        <p class="text-blue-800 mb-1"><i class="fa-solid fa-phone mr-2"></i> <strong>Telefone:</strong> (00) 0000-0000</p>
+                        <p class="text-blue-800"><i class="fa-solid fa-location-dot mr-2"></i> <strong>Endereço:</strong> Rua Exemplo, 123 - Cidade/UF</p>
+                    </div>
+                </section>
+
+            </article>
+        </div>
+    </main>
+
+    <!-- Rodapé -->
+    <footer class="bg-slate-900 text-slate-300 py-12 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-white text-lg font-bold mb-4">[Nome da Empresa]</h3>
+                    <p class="text-sm text-slate-400">Comprometidos com a qualidade e a segurança dos seus dados.</p>
+                </div>
+                <div>
+                    <h3 class="text-white text-lg font-bold mb-4">Links Rápidos</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-white transition-colors">Início</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Termos de Uso</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Política de Cookies</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-white text-lg font-bold mb-4">Legal</h3>
+                    <p class="text-sm text-slate-400">CNPJ: 00.000.000/0001-00</p>
+                    <p class="text-sm text-slate-400 mt-2">&copy; <span id="current-year"></span> Todos os direitos reservados.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Botão Voltar ao Topo -->
+    <button id="backToTop" class="fixed bottom-8 right-8 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-all opacity-0 invisible z-50" title="Voltar ao topo">
+        <i class="fa-solid fa-arrow-up"></i>
+    </button>
+
+    <!-- Scripts -->
+    <script>
+        // 1. Atualizar Ano e Data
+        const today = new Date();
+        document.getElementById('current-year').textContent = today.getFullYear();
+        
+        // Formata a data para Português
+        const options = { day: 'numeric', month: 'long', year: 'numeric' };
+        document.getElementById('last-updated').textContent = today.toLocaleDateString('pt-BR', options);
+
+        // 2. Comportamento do Menu Lateral (Active State on Scroll)
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                
+                // Offset de 150px para compensar o header fixo
+                if (scrollY >= (sectionTop - 150)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').includes(current) && current !== '') {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // 3. Botão Voltar ao Topo
+        const backToTopButton = document.getElementById('backToTop');
+
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTopButton.classList.remove('opacity-0', 'invisible');
+            } else {
+                backToTopButton.classList.add('opacity-0', 'invisible');
+            }
+        });
+
+        backToTopButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    </script>
+</body>
+</html>`,
+  terms: `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Termos de Uso | [Nome da Empresa]</title>
+    <meta name="description" content="Termos de Uso e Condições Gerais da [Nome da Empresa].">
+    
+    <!-- Tailwind CSS (via CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Configurações de Fonte (Inter) -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        /* Estilização da barra de rolagem */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Destaque do link ativo no menu lateral */
+        .nav-link.active {
+            color: #2563eb;
+            border-left: 3px solid #2563eb;
+            background-color: #eff6ff;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-700 antialiased">
+
+    <!-- Cabeçalho -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo / Nome da Empresa -->
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="#" class="text-xl font-bold text-slate-900">
+                        <i class="fa-solid fa-file-contract text-blue-600 mr-2"></i>
+                        [Nome da Empresa]
+                    </a>
+                </div>
+                
+                <!-- Navegação Simples -->
+                <nav class="hidden md:flex space-x-8">
+                    <a href="index.html" class="text-slate-500 hover:text-blue-600 px-3 py-2 text-sm font-medium">Home</a>
+                    <a href="politica_privacidade.html" class="text-slate-500 hover:text-blue-600 px-3 py-2 text-sm font-medium">Privacidade</a>
+                    <a href="#" class="text-blue-600 px-3 py-2 text-sm font-medium border-b-2 border-blue-600">Termos de Uso</a>
+                    <a href="#" class="text-slate-500 hover:text-blue-600 px-3 py-2 text-sm font-medium">Contato</a>
+                </nav>
+
+                <!-- Menu Mobile Button -->
+                <div class="flex items-center md:hidden">
+                    <button type="button" class="text-slate-500 hover:text-slate-700 focus:outline-none">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Cabeçalho do Documento -->
+    <div class="bg-slate-800 text-white py-12">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold mb-4">Termos de Uso</h1>
+            <p class="text-slate-300 text-lg">Regras e condições para a utilização dos nossos serviços.</p>
+            <p class="mt-4 text-sm text-slate-400">Última atualização: <span id="last-updated"></span></p>
+        </div>
+    </div>
+
+    <!-- Conteúdo Principal -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div class="flex flex-col md:flex-row gap-8">
+            
+            <!-- Menu Lateral (Sticky) -->
+            <aside class="md:w-1/4 hidden md:block">
+                <nav class="sticky top-24 bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="p-4 bg-slate-50 border-b border-slate-200 font-semibold text-slate-800">
+                        Índice
+                    </div>
+                    <ul class="flex flex-col py-2">
+                        <li><a href="#aceitacao" class="nav-link block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 border-l-3 border-transparent">1. Aceitação</a></li>
+                        <li><a href="#acesso" class="nav-link block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 border-l-3 border-transparent">2. Acesso e Cadastro</a></li>
+                        <li><a href="#obrigacoes" class="nav-link block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 border-l-3 border-transparent">3. Obrigações</a></li>
+                        <li><a href="#propriedade" class="nav-link block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 border-l-3 border-transparent">4. Propriedade Intelectual</a></li>
+                        <li><a href="#privacidade" class="nav-link block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 border-l-3 border-transparent">5. Privacidade</a></li>
+                        <li><a href="#isencao" class="nav-link block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 border-l-3 border-transparent">6. Isenção de Garantias</a></li>
+                        <li><a href="#alteracoes" class="nav-link block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 border-l-3 border-transparent">7. Alterações</a></li>
+                        <li><a href="#foro" class="nav-link block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 border-l-3 border-transparent">8. Foro</a></li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <!-- Texto do Documento -->
+            <article class="md:w-3/4 bg-white p-8 rounded-lg shadow-sm border border-slate-200 leading-relaxed text-justify">
+                
+                <!-- Seção 1 -->
+                <section id="aceitacao" class="mb-10 scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">1. Aceitação dos Termos</h2>
+                    <p class="mb-4">
+                        Bem-vindo à <strong>[Nome da Sua Empresa]</strong>. Ao acessar e utilizar nosso site, você concorda em cumprir e estar vinculado aos seguintes Termos de Uso. 
+                    </p>
+                    <p>
+                        Se você não concordar com qualquer parte destes termos, você não deve acessar ou utilizar nossos serviços. Estes Termos aplicam-se a todos os visitantes, usuários e outras pessoas que acessam ou usam o Serviço.
+                    </p>
+                </section>
+
+                <!-- Seção 2 -->
+                <section id="acesso" class="mb-10 scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">2. Acesso e Cadastro</h2>
+                    <p class="mb-4">Para acessar certos recursos do site, pode ser necessário que você forneça certas informações para criar uma conta ("Cadastro").</p>
+                    <ul class="list-disc pl-6 mb-4 space-y-2">
+                        <li>Você garante que as informações fornecidas são verdadeiras, precisas e completas.</li>
+                        <li>Você é responsável por manter a confidencialidade de sua senha e conta.</li>
+                        <li>Você concorda em nos notificar imediatamente sobre qualquer uso não autorizado de sua conta.</li>
+                    </ul>
+                </section>
+
+                <!-- Seção 3 -->
+                <section id="obrigacoes" class="mb-10 scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">3. Obrigações do Usuário</h2>
+                    <p class="mb-4">Ao utilizar nosso serviço, você concorda em não:</p>
+                    <div class="bg-red-50 p-4 rounded border border-red-100 text-red-800 text-sm">
+                        <ul class="list-disc pl-5 space-y-1">
+                            <li>Violar qualquer lei ou regulamento aplicável.</li>
+                            <li>Tentar interferir ou comprometer a integridade ou segurança do sistema.</li>
+                            <li>Enviar publicidade não solicitada (SPAM).</li>
+                            <li>Coletar dados de outros usuários sem consentimento.</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- Seção 4 -->
+                <section id="propriedade" class="mb-10 scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">4. Propriedade Intelectual</h2>
+                    <p class="mb-4">
+                        O Serviço e seu conteúdo original (excluindo Conteúdo fornecido por usuários), recursos e funcionalidades são e permanecerão de propriedade exclusiva da <strong>[Nome da Sua Empresa]</strong> e seus licenciadores.
+                    </p>
+                    <p>
+                        O Serviço é protegido por direitos autorais, marcas registradas e outras leis do Brasil e de outros países. Nossas marcas registradas não podem ser usadas em conexão com qualquer produto ou serviço sem o consentimento prévio por escrito.
+                    </p>
+                </section>
+
+                <!-- Seção 5 -->
+                <section id="privacidade" class="mb-10 scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">5. Privacidade</h2>
+                    <p>
+                        A sua privacidade é importante para nós. A utilização dos nossos serviços também é regida pela nossa <a href="politica_privacidade.html" class="text-blue-600 hover:underline font-semibold">Política de Privacidade</a>, que descreve como coletamos, usamos e compartilhamos suas informações.
+                    </p>
+                </section>
+
+                <!-- Seção 6 -->
+                <section id="isencao" class="mb-10 scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">6. Limitação de Responsabilidade</h2>
+                    <p class="mb-4">
+                        Em nenhum caso a <strong>[Nome da Sua Empresa]</strong>, nem seus diretores, funcionários, parceiros, agentes, fornecedores ou afiliados, serão responsáveis por quaisquer danos indiretos, incidentais, especiais, consequenciais ou punitivos, incluindo, sem limitação, perda de lucros, dados, uso, boa vontade ou outras perdas intangíveis.
+                    </p>
+                    <p class="text-sm text-slate-500 italic">
+                        O serviço é fornecido "no estado em que se encontra" e "conforme disponível", sem garantias de qualquer tipo.
+                    </p>
+                </section>
+
+                <!-- Seção 7 -->
+                <section id="alteracoes" class="mb-10 scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">7. Alterações nos Termos</h2>
+                    <p>
+                        Reservamo-nos o direito, a nosso exclusivo critério, de modificar ou substituir estes Termos a qualquer momento. Se uma revisão for material, tentaremos fornecer um aviso com pelo menos 30 dias de antecedência antes que quaisquer novos termos entrem em vigor. O que constitui uma mudança material será determinado a nosso exclusivo critério.
+                    </p>
+                </section>
+
+                <!-- Seção 8 -->
+                <section id="foro" class="scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">8. Legislação e Foro</h2>
+                    <p>
+                        Estes Termos serão regidos e interpretados de acordo com as leis do Brasil, sem levar em conta o conflito de provisões legais.
+                    </p>
+                    <p class="mt-2">
+                        Fica eleito o foro da comarca de <strong>[Sua Cidade/UF]</strong> para dirimir quaisquer dúvidas ou litígios oriundos deste termo, com renúncia expressa a qualquer outro, por mais privilegiado que seja.
+                    </p>
+                </section>
+
+            </article>
+        </div>
+    </main>
+
+    <!-- Rodapé -->
+    <footer class="bg-slate-900 text-slate-300 py-12 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-white text-lg font-bold mb-4">[Nome da Empresa]</h3>
+                    <p class="text-sm text-slate-400">Excelência em serviços digitais.</p>
+                </div>
+                <div>
+                    <h3 class="text-white text-lg font-bold mb-4">Links Rápidos</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="politica_privacidade.html" class="hover:text-white transition-colors">Política de Privacidade</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors text-white font-semibold">Termos de Uso</a></li>
+                        <li><a href="politica_cookies.html" class="hover:text-white transition-colors">Política de Cookies</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-white text-lg font-bold mb-4">Legal</h3>
+                    <p class="text-sm text-slate-400">CNPJ: 00.000.000/0001-00</p>
+                    <p class="text-sm text-slate-400 mt-2">&copy; <span id="current-year"></span> Todos os direitos reservados.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Botão Voltar ao Topo -->
+    <button id="backToTop" class="fixed bottom-8 right-8 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-all opacity-0 invisible z-50" title="Voltar ao topo">
+        <i class="fa-solid fa-arrow-up"></i>
+    </button>
+
+    <!-- Scripts -->
+    <script>
+        // 1. Atualizar Ano e Data
+        const today = new Date();
+        document.getElementById('current-year').textContent = today.getFullYear();
+        const options = { day: 'numeric', month: 'long', year: 'numeric' };
+        document.getElementById('last-updated').textContent = today.toLocaleDateString('pt-BR', options);
+
+        // 2. Comportamento do Menu Lateral
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (scrollY >= (sectionTop - 150)) {
+                    current = section.getAttribute('id');
+                }
+            });
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').includes(current) && current !== '') {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // 3. Botão Voltar ao Topo
+        const backToTopButton = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTopButton.classList.remove('opacity-0', 'invisible');
+            } else {
+                backToTopButton.classList.add('opacity-0', 'invisible');
+            }
+        });
+        backToTopButton.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>`,
+  support: `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Central de Suporte | [Nome da Empresa]</title>
+    <meta name="description" content="Central de Ajuda e Suporte da [Nome da Empresa]. Tire suas dúvidas ou entre em contato.">
+    
+    <!-- Tailwind CSS (via CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Configurações de Fonte (Inter) -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        /* Estilização da barra de rolagem */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Destaque do link ativo no menu lateral */
+        .nav-link.active {
+            color: #2563eb;
+            border-left: 3px solid #2563eb;
+            background-color: #eff6ff;
+            font-weight: 600;
+        }
+
+        /* Estilo para inputs do formulário */
+        .form-input {
+            transition: all 0.3s ease;
+        }
+        .form-input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            outline: none;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-700 antialiased">
+
+    <!-- Cabeçalho -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo / Nome da Empresa -->
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="#" class="text-xl font-bold text-slate-900">
+                        <i class="fa-solid fa-headset text-blue-600 mr-2"></i>
+                        [Nome da Empresa]
+                    </a>
+                </div>
+                
+                <!-- Navegação Simples -->
+                <nav class="hidden md:flex space-x-8">
+                    <a href="index.html" class="text-slate-500 hover:text-blue-600 px-3 py-2 text-sm font-medium">Home</a>
+                    <a href="politica_privacidade.html" class="text-slate-500 hover:text-blue-600 px-3 py-2 text-sm font-medium">Privacidade</a>
+                    <a href="termos_uso.html" class="text-slate-500 hover:text-blue-600 px-3 py-2 text-sm font-medium">Termos de Uso</a>
+                    <a href="#" class="text-blue-600 px-3 py-2 text-sm font-medium border-b-2 border-blue-600">Suporte</a>
+                </nav>
+
+                <!-- Menu Mobile Button -->
+                <div class="flex items-center md:hidden">
+                    <button type="button" class="text-slate-500 hover:text-slate-700 focus:outline-none">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Cabeçalho do Documento (Hero) -->
+    <div class="bg-blue-900 text-white py-12">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold mb-4">Como podemos ajudar?</h1>
+            <p class="text-blue-200 text-lg">Central de Atendimento e Suporte Técnico.</p>
+            
+            <!-- Barra de busca simulada -->
+            <div class="max-w-lg mx-auto mt-8 relative">
+                <input type="text" placeholder="Busque por dúvidas (ex: redefinir senha)" class="w-full py-3 px-4 pl-12 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-lg">
+                <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-slate-400"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Conteúdo Principal -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div class="flex flex-col md:flex-row gap-8">
+            
+            <!-- Menu Lateral (Sticky) -->
+            <aside class="md:w-1/4 hidden md:block">
+                <nav class="sticky top-24 bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="p-4 bg-slate-50 border-b border-slate-200 font-semibold text-slate-800">
+                        Navegação
+                    </div>
+                    <ul class="flex flex-col py-2">
+                        <li><a href="#faq" class="nav-link block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 border-l-3 border-transparent">1. Perguntas Frequentes</a></li>
+                        <li><a href="#canais" class="nav-link block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 border-l-3 border-transparent">2. Canais de Atendimento</a></li>
+                        <li><a href="#horarios" class="nav-link block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 border-l-3 border-transparent">3. Horários</a></li>
+                        <li><a href="#formulario" class="nav-link block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 border-l-3 border-transparent">4. Abrir Chamado</a></li>
+                        <li><a href="#feedback" class="nav-link block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 border-l-3 border-transparent">5. Ouvidoria</a></li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <!-- Conteúdo -->
+            <article class="md:w-3/4 space-y-8">
+                
+                <!-- Seção 1: FAQ -->
+                <section id="faq" class="bg-white p-8 rounded-lg shadow-sm border border-slate-200 scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-6 pb-2 border-b border-slate-100">1. Perguntas Frequentes (FAQ)</h2>
+                    
+                    <div class="space-y-4">
+                        <!-- Pergunta 1 -->
+                        <div class="border border-slate-200 rounded-lg p-4 hover:border-blue-300 transition-colors">
+                            <h3 class="font-semibold text-blue-800 mb-2 flex items-center">
+                                <i class="fa-solid fa-circle-question mr-2 text-blue-500"></i>
+                                Como faço para redefinir minha senha?
+                            </h3>
+                            <p class="text-sm text-slate-600 ml-6">
+                                Acesse a página de login e clique em "Esqueci minha senha". Enviaremos um link de redefinição para o seu e-mail cadastrado.
+                            </p>
+                        </div>
+
+                        <!-- Pergunta 2 -->
+                        <div class="border border-slate-200 rounded-lg p-4 hover:border-blue-300 transition-colors">
+                            <h3 class="font-semibold text-blue-800 mb-2 flex items-center">
+                                <i class="fa-solid fa-circle-question mr-2 text-blue-500"></i>
+                                Quais as formas de pagamento aceitas?
+                            </h3>
+                            <p class="text-sm text-slate-600 ml-6">
+                                Aceitamos cartões de crédito (Visa, Mastercard, Elo), boleto bancário e PIX com aprovação imediata.
+                            </p>
+                        </div>
+
+                        <!-- Pergunta 3 -->
+                        <div class="border border-slate-200 rounded-lg p-4 hover:border-blue-300 transition-colors">
+                            <h3 class="font-semibold text-blue-800 mb-2 flex items-center">
+                                <i class="fa-solid fa-circle-question mr-2 text-blue-500"></i>
+                                Como solicito um reembolso?
+                            </h3>
+                            <p class="text-sm text-slate-600 ml-6">
+                                O reembolso pode ser solicitado em até 7 dias após a compra. Entre em contato pelo formulário abaixo ou pelo nosso chat.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Seção 2: Canais -->
+                <section id="canais" class="bg-white p-8 rounded-lg shadow-sm border border-slate-200 scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-6 pb-2 border-b border-slate-100">2. Canais de Atendimento</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Card E-mail -->
+                        <div class="p-6 bg-blue-50 rounded-lg text-center border border-blue-100">
+                            <div class="w-12 h-12 bg-blue-200 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-800">
+                                <i class="fa-solid fa-envelope text-xl"></i>
+                            </div>
+                            <h3 class="font-bold text-slate-800">E-mail</h3>
+                            <p class="text-sm text-slate-600 mb-4">Para dúvidas gerais e orçamentos.</p>
+                            <a href="mailto:suporte@suaempresa.com" class="text-blue-600 font-semibold hover:underline">suporte@suaempresa.com</a>
+                        </div>
+
+                        <!-- Card WhatsApp -->
+                        <div class="p-6 bg-green-50 rounded-lg text-center border border-green-100">
+                            <div class="w-12 h-12 bg-green-200 rounded-full flex items-center justify-center mx-auto mb-4 text-green-800">
+                                <i class="fa-brands fa-whatsapp text-xl"></i>
+                            </div>
+                            <h3 class="font-bold text-slate-800">WhatsApp</h3>
+                            <p class="text-sm text-slate-600 mb-4">Atendimento rápido e ágil.</p>
+                            <a href="#" class="text-green-600 font-semibold hover:underline">(00) 90000-0000</a>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Seção 3: Horários -->
+                <section id="horarios" class="bg-white p-8 rounded-lg shadow-sm border border-slate-200 scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">3. Horários de Atendimento</h2>
+                    <p class="mb-4">Nossa equipe está disponível para ajudar nos seguintes horários:</p>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full text-sm text-left text-slate-600">
+                            <thead class="bg-slate-50 text-slate-800 font-semibold">
+                                <tr>
+                                    <th class="px-6 py-3">Dia da Semana</th>
+                                    <th class="px-6 py-3">Horário</th>
+                                    <th class="px-6 py-3">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 border border-slate-100">
+                                <tr>
+                                    <td class="px-6 py-4 font-medium">Segunda a Sexta</td>
+                                    <td class="px-6 py-4">08:00 às 18:00</td>
+                                    <td class="px-6 py-4"><span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">Aberto</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 font-medium">Sábado</td>
+                                    <td class="px-6 py-4">09:00 às 13:00</td>
+                                    <td class="px-6 py-4"><span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs">Plantão</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 font-medium">Domingo e Feriados</td>
+                                    <td class="px-6 py-4">-</td>
+                                    <td class="px-6 py-4"><span class="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs">Fechado</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Seção 4: Formulário -->
+                <section id="formulario" class="bg-white p-8 rounded-lg shadow-sm border border-slate-200 scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-6 pb-2 border-b border-slate-100">4. Abrir Chamado</h2>
+                    <p class="mb-6 text-slate-600">Preencha o formulário abaixo e entraremos em contato o mais breve possível.</p>
+                    
+                    <form action="#" method="POST" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="nome" class="block text-sm font-medium text-slate-700 mb-1">Nome Completo</label>
+                                <input type="text" id="nome" name="nome" class="form-input w-full border-slate-300 rounded-md shadow-sm p-2 border" placeholder="Seu nome" required>
+                            </div>
+                            <div>
+                                <label for="email" class="block text-sm font-medium text-slate-700 mb-1">E-mail</label>
+                                <input type="email" id="email" name="email" class="form-input w-full border-slate-300 rounded-md shadow-sm p-2 border" placeholder="seu@email.com" required>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="assunto" class="block text-sm font-medium text-slate-700 mb-1">Assunto</label>
+                            <select id="assunto" name="assunto" class="form-input w-full border-slate-300 rounded-md shadow-sm p-2 border">
+                                <option>Selecione um assunto...</option>
+                                <option>Suporte Técnico</option>
+                                <option>Financeiro / Cobrança</option>
+                                <option>Vendas</option>
+                                <option>Outros</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="mensagem" class="block text-sm font-medium text-slate-700 mb-1">Mensagem</label>
+                            <textarea id="mensagem" name="mensagem" rows="4" class="form-input w-full border-slate-300 rounded-md shadow-sm p-2 border" placeholder="Descreva seu problema ou dúvida..." required></textarea>
+                        </div>
+
+                        <div class="pt-2">
+                            <button type="submit" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition-colors shadow-sm">
+                                <i class="fa-solid fa-paper-plane mr-2"></i> Enviar Mensagem
+                            </button>
+                        </div>
+                    </form>
+                </section>
+
+                <!-- Seção 5: Feedback -->
+                <section id="feedback" class="bg-slate-50 p-8 rounded-lg border border-slate-200 scroll-mt-24 text-center">
+                    <h2 class="text-xl font-bold text-slate-800 mb-2">Ouvidoria</h2>
+                    <p class="text-sm text-slate-600 mb-4">Seu problema não foi resolvido pelos canais tradicionais?</p>
+                    <a href="mailto:ouvidoria@suaempresa.com" class="inline-block border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 hover:text-blue-600 font-medium py-2 px-4 rounded transition-colors">
+                        Contatar Ouvidoria
+                    </a>
+                </section>
+
+            </article>
+        </div>
+    </main>
+
+    <!-- Rodapé -->
+    <footer class="bg-slate-900 text-slate-300 py-12 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-white text-lg font-bold mb-4">[Nome da Empresa]</h3>
+                    <p class="text-sm text-slate-400">Sua satisfação é nossa prioridade.</p>
+                </div>
+                <div>
+                    <h3 class="text-white text-lg font-bold mb-4">Links Úteis</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="politica_privacidade.html" class="hover:text-white transition-colors">Política de Privacidade</a></li>
+                        <li><a href="termos_uso.html" class="hover:text-white transition-colors">Termos de Uso</a></li>
+                        <li><a href="politica_cookies.html" class="hover:text-white transition-colors">Política de Cookies</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-white text-lg font-bold mb-4">Contato</h3>
+                    <p class="text-sm text-slate-400 mb-2"><i class="fa-solid fa-envelope mr-2"></i> suporte@suaempresa.com</p>
+                    <p class="text-sm text-slate-400"><i class="fa-solid fa-phone mr-2"></i> (00) 0000-0000</p>
+                    <p class="text-sm text-slate-400 mt-4">&copy; <span id="current-year"></span> Todos os direitos reservados.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Botão Voltar ao Topo -->
+    <button id="backToTop" class="fixed bottom-8 right-8 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-all opacity-0 invisible z-50" title="Voltar ao topo">
+        <i class="fa-solid fa-arrow-up"></i>
+    </button>
+
+    <!-- Scripts -->
+    <script>
+        // 1. Atualizar Ano
+        const today = new Date();
+        document.getElementById('current-year').textContent = today.getFullYear();
+        
+        // 2. Comportamento do Menu Lateral
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                
+                // Offset ajustado
+                if (scrollY >= (sectionTop - 150)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').includes(current) && current !== '') {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // 3. Botão Voltar ao Topo
+        const backToTopButton = document.getElementById('backToTop');
+
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTopButton.classList.remove('opacity-0', 'invisible');
+            } else {
+                backToTopButton.classList.add('opacity-0', 'invisible');
+            }
+        });
+
+        backToTopButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    </script>
+</body>
+</html>`,
+  cookies: `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Política de Cookies | [Nome da Empresa]</title>
+    <meta name="description" content="Política de Cookies da [Nome da Empresa]. Saiba como utilizamos cookies.">
+    
+    <!-- Tailwind CSS (via CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Configurações de Fonte (Inter) -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .nav-link.active {
+            color: #2563eb;
+            border-left: 3px solid #2563eb;
+            background-color: #eff6ff;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-700 antialiased">
+
+    <!-- Cabeçalho -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="#" class="text-xl font-bold text-slate-900">
+                        <i class="fa-solid fa-cookie-bite text-blue-600 mr-2"></i>
+                        [Nome da Empresa]
+                    </a>
+                </div>
+                
+                <!-- Navegação -->
+                <nav class="hidden md:flex space-x-8">
+                    <a href="index.html" class="text-slate-500 hover:text-blue-600 px-3 py-2 text-sm font-medium">Home</a>
+                    <a href="politica_privacidade.html" class="text-slate-500 hover:text-blue-600 px-3 py-2 text-sm font-medium">Privacidade</a>
+                    <a href="termos_uso.html" class="text-slate-500 hover:text-blue-600 px-3 py-2 text-sm font-medium">Termos de Uso</a>
+                    <a href="#" class="text-slate-500 hover:text-blue-600 px-3 py-2 text-sm font-medium">Contato</a>
+                </nav>
+
+                <!-- Mobile Button -->
+                <div class="flex items-center md:hidden">
+                    <button type="button" class="text-slate-500 hover:text-slate-700 focus:outline-none">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <div class="bg-slate-800 text-white py-12">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold mb-4">Política de Cookies</h1>
+            <p class="text-slate-300 text-lg">Entenda o que são cookies e como você pode controlá-los.</p>
+            <p class="mt-4 text-sm text-slate-400">Última atualização: <span id="last-updated"></span></p>
+        </div>
+    </div>
+
+    <!-- Conteúdo Principal -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div class="flex flex-col md:flex-row gap-8">
+            
+            <!-- Menu Lateral -->
+            <aside class="md:w-1/4 hidden md:block">
+                <nav class="sticky top-24 bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="p-4 bg-slate-50 border-b border-slate-200 font-semibold text-slate-800">
+                        Navegação
+                    </div>
+                    <ul class="flex flex-col py-2">
+                        <li><a href="#o-que-sao" class="nav-link block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 border-l-3 border-transparent">1. O que são Cookies?</a></li>
+                        <li><a href="#como-usamos" class="nav-link block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 border-l-3 border-transparent">2. Como Usamos</a></li>
+                        <li><a href="#tipos" class="nav-link block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 border-l-3 border-transparent">3. Tipos de Cookies</a></li>
+                        <li><a href="#gerenciamento" class="nav-link block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 border-l-3 border-transparent">4. Gerenciamento</a></li>
+                        <li><a href="#alteracoes" class="nav-link block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 border-l-3 border-transparent">5. Alterações</a></li>
+                        <li><a href="#contato" class="nav-link block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 border-l-3 border-transparent">6. Contato</a></li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <!-- Artigo -->
+            <article class="md:w-3/4 bg-white p-8 rounded-lg shadow-sm border border-slate-200 leading-relaxed text-justify">
+                
+                <section id="o-que-sao" class="mb-10 scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">1. O que são Cookies?</h2>
+                    <p class="mb-4">
+                        Cookies são pequenos arquivos de texto que são baixados no seu computador, celular ou qualquer outro dispositivo quando você visita um site. Eles permitem que o site reconheça o seu dispositivo e armazene algumas informações sobre as suas preferências ou ações passadas.
+                    </p>
+                    <p>
+                        Os cookies não podem ser usados para executar programas ou enviar vírus para o seu computador.
+                    </p>
+                </section>
+
+                <section id="como-usamos" class="mb-10 scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">2. Como Usamos os Cookies</h2>
+                    <p class="mb-4">Utilizamos cookies por vários motivos, tais como:</p>
+                    <ul class="list-disc pl-6 space-y-2">
+                        <li>Para permitir o funcionamento correto do nosso site.</li>
+                        <li>Para melhorar a sua experiência de navegação (lembrando suas preferências).</li>
+                        <li>Para entender como os usuários utilizam o nosso site (análise de tráfego).</li>
+                        <li>Para fins de marketing e publicidade personalizada.</li>
+                    </ul>
+                </section>
+
+                <section id="tipos" class="mb-10 scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">3. Tipos de Cookies que Utilizamos</h2>
+                    
+                    <div class="space-y-6">
+                        <div class="bg-slate-50 p-4 rounded border border-slate-100">
+                            <h3 class="font-bold text-blue-900 mb-2">Cookies Estritamente Necessários</h3>
+                            <p class="text-sm">Esses cookies são essenciais para que você possa navegar pelo site e usar seus recursos, como acessar áreas seguras. Sem esses cookies, os serviços que você solicitou não podem ser fornecidos.</p>
+                        </div>
+
+                        <div class="bg-slate-50 p-4 rounded border border-slate-100">
+                            <h3 class="font-bold text-blue-900 mb-2">Cookies de Desempenho</h3>
+                            <p class="text-sm">Esses cookies coletam informações sobre como os visitantes usam um site, por exemplo, quais páginas os visitantes acessam com mais frequência. Toda informação que esses cookies coletam é agregada e, portanto, anônima.</p>
+                        </div>
+
+                        <div class="bg-slate-50 p-4 rounded border border-slate-100">
+                            <h3 class="font-bold text-blue-900 mb-2">Cookies de Funcionalidade</h3>
+                            <p class="text-sm">Permitem que o site se lembre das escolhas que você faz (como seu nome de usuário, idioma ou região) e forneça recursos aprimorados e mais pessoais.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="gerenciamento" class="mb-10 scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">4. Gerenciamento de Cookies</h2>
+                    <p class="mb-4">
+                        Você tem o direito de decidir se aceita ou rejeita cookies. Você pode definir ou alterar os controles do seu navegador da Web para aceitar ou recusar cookies.
+                    </p>
+                    <p class="mb-4">Veja como gerenciar cookies nos navegadores mais populares:</p>
+                    <div class="flex flex-wrap gap-3">
+                        <a href="https://support.google.com/chrome/answer/95647" target="_blank" class="px-3 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-sm">Google Chrome</a>
+                        <a href="https://support.mozilla.org/pt-BR/kb/ative-e-desative-os-cookies-que-os-sites-usam" target="_blank" class="px-3 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-sm">Mozilla Firefox</a>
+                        <a href="https://support.apple.com/pt-br/guide/safari/sfri11471/mac" target="_blank" class="px-3 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-sm">Apple Safari</a>
+                        <a href="https://support.microsoft.com/pt-br/microsoft-edge/excluir-cookies-no-microsoft-edge-63947406-40ac-c3b8-57b9-2a946a29ae09" target="_blank" class="px-3 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-sm">Microsoft Edge</a>
+                    </div>
+                </section>
+
+                <section id="alteracoes" class="mb-10 scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">5. Alterações nesta Política</h2>
+                    <p>
+                        Podemos atualizar esta Política de Cookies periodicamente para refletir, por exemplo, alterações nos cookies que usamos ou por outras razões operacionais, legais ou regulamentares. Por favor, visite esta Política de Cookies regularmente para se manter informado.
+                    </p>
+                </section>
+
+                <section id="contato" class="scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">6. Contato</h2>
+                    <p>Se você tiver alguma dúvida sobre nosso uso de cookies ou outras tecnologias, envie um e-mail para:</p>
+                    <p class="mt-2 font-semibold text-blue-600">privacidade@suaempresa.com</p>
+                </section>
+
+            </article>
+        </div>
+    </main>
+
+    <!-- Rodapé -->
+    <footer class="bg-slate-900 text-slate-300 py-12 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-white text-lg font-bold mb-4">[Nome da Empresa]</h3>
+                    <p class="text-sm text-slate-400">Transparência e respeito com seus dados.</p>
+                </div>
+                <div>
+                    <h3 class="text-white text-lg font-bold mb-4">Links Rápidos</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="politica_privacidade.html" class="hover:text-white transition-colors">Política de Privacidade</a></li>
+                        <li><a href="termos_uso.html" class="hover:text-white transition-colors">Termos de Uso</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors text-white font-semibold">Política de Cookies</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-white text-lg font-bold mb-4">Legal</h3>
+                    <p class="text-sm text-slate-400">CNPJ: 00.000.000/0001-00</p>
+                    <p class="text-sm text-slate-400 mt-2">&copy; <span id="current-year"></span> Todos os direitos reservados.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Botão Voltar ao Topo -->
+    <button id="backToTop" class="fixed bottom-8 right-8 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-all opacity-0 invisible z-50" title="Voltar ao topo">
+        <i class="fa-solid fa-arrow-up"></i>
+    </button>
+
+    <script>
+        const today = new Date();
+        document.getElementById('current-year').textContent = today.getFullYear();
+        const options = { day: 'numeric', month: 'long', year: 'numeric' };
+        document.getElementById('last-updated').textContent = today.toLocaleDateString('pt-BR', options);
+
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('.nav-link');
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (scrollY >= (sectionTop - 150)) current = section.getAttribute('id');
+            });
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').includes(current) && current !== '') link.classList.add('active');
+            });
+        });
+
+        const backToTopButton = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) backToTopButton.classList.remove('opacity-0', 'invisible');
+            else backToTopButton.classList.add('opacity-0', 'invisible');
+        });
+        backToTopButton.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>`,
+};
 
 
 // ============================================================================
@@ -658,9 +1930,10 @@ const Footer = () => (
         </div>
 
         <div className="flex flex-wrap items-center justify-center gap-6 text-sm">
-          <a href="/suporte" className="text-slate-600 hover:text-slate-900">Suporte</a>
-          <a href="/privacidade" className="text-slate-600 hover:text-slate-900">Privacidade</a>
-          <a href="/termos" className="text-slate-600 hover:text-slate-900">Termos</a>
+          <a href={withBase(`${INSTITUTIONAL_BASE}/suporte.html`)} className="text-slate-600 hover:text-slate-900" target="_blank" rel="noreferrer">Suporte</a>
+          <a href={withBase(`${INSTITUTIONAL_BASE}/politicaPrivacidade.html`)} className="text-slate-600 hover:text-slate-900" target="_blank" rel="noreferrer">Privacidade</a>
+          <a href={withBase(`${INSTITUTIONAL_BASE}/termosUso.html`)} className="text-slate-600 hover:text-slate-900" target="_blank" rel="noreferrer">Termos</a>
+          <a href={withBase(`${INSTITUTIONAL_BASE}/cookies.html`)} className="text-slate-600 hover:text-slate-900" target="_blank" rel="noreferrer">Cookies</a>
         </div>
 
         <div className="text-sm text-slate-500">
@@ -831,7 +2104,7 @@ const LoginPage = () => {
               <div className="p-8">
                   <div className="mb-8 text-center">
                       <div className="mx-auto mb-4 h-12 w-12 rounded-2xl bg-blue-600 flex items-center justify-center text-white font-bold">M</div>
-                      <h1 className="text-2xl font-bold text-slate-900">Acessar Plataforma</h1>
+                      <h1 className="text-2xl font-bold text-slate-900">Medicina JVS</h1>
                       <p className="text-slate-500 mt-1">Entre com seu e-mail e senha</p>
                   </div>
 
@@ -902,6 +2175,13 @@ const LoginPage = () => {
 
                       <div className="pt-2 text-center text-xs text-slate-500">
                           Precisa de acesso? Fale com o suporte.
+                      </div>
+
+                      <div className="mt-4 flex flex-wrap items-center justify-center gap-4 text-xs text-slate-500">
+                          <a href={withBase(`${INSTITUTIONAL_BASE}/suporte.html`)} className="hover:text-slate-800 hover:underline" target="_blank" rel="noreferrer">Suporte</a>
+                          <a href={withBase(`${INSTITUTIONAL_BASE}/politicaPrivacidade.html`)} className="hover:text-slate-800 hover:underline" target="_blank" rel="noreferrer">Privacidade</a>
+                          <a href={withBase(`${INSTITUTIONAL_BASE}/termosUso.html`)} className="hover:text-slate-800 hover:underline" target="_blank" rel="noreferrer">Termos</a>
+                          <a href={withBase(`${INSTITUTIONAL_BASE}/cookies.html`)} className="hover:text-slate-800 hover:underline" target="_blank" rel="noreferrer">Cookies</a>
                       </div>
                   </form>
               </div>
@@ -1646,53 +2926,75 @@ const Dashboard = ({ authUser, userData, setUserData, userRole, courses }) => {
 
 // --- ROTAS ---
 
-// --- PÁGINAS PÚBLICAS ---
-const PrivacyPage = () => (
-  <div className="min-h-screen bg-slate-50">
-    <div className="max-w-3xl mx-auto px-6 py-12">
-      <h1 className="text-3xl font-bold text-slate-900 mb-4">Política de Privacidade</h1>
-      <p className="text-slate-700 leading-relaxed">
-        Esta é uma página modelo. Aqui você pode descrever como os dados são coletados, usados e armazenados.
-        Para ambientes com dados sensíveis, recomendamos seguir LGPD e boas práticas de segurança.
-      </p>
-      <div className="mt-8">
-        <a className="text-blue-600 hover:underline" href="/login">Voltar</a>
-      </div>
-    </div>
-  </div>
-);
+// --- PÁGINAS PÚBLICAS (HTML ACOPLADO) ---
+// Renderiza os arquivos HTML (Privacidade/Termos/Suporte/Cookies) dentro do React, sem sair do app.
+const extractFromHtml = (fullHtml = "") => {
+  const headMatch = fullHtml.match(/<head[^>]*>([\s\S]*?)<\/head>/i);
+  const bodyMatch = fullHtml.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
 
-const TermsPage = () => (
-  <div className="min-h-screen bg-slate-50">
-    <div className="max-w-3xl mx-auto px-6 py-12">
-      <h1 className="text-3xl font-bold text-slate-900 mb-4">Termos de Uso</h1>
-      <p className="text-slate-700 leading-relaxed">
-        Esta é uma página modelo. Aqui você descreve regras de uso, responsabilidade, direitos autorais e conduta.
-      </p>
-      <div className="mt-8">
-        <a className="text-blue-600 hover:underline" href="/login">Voltar</a>
-      </div>
-    </div>
-  </div>
-);
+  const head = (headMatch?.[1] || "").trim();
+  const body = (bodyMatch?.[1] || fullHtml).trim();
 
-const SupportPage = () => (
-  <div className="min-h-screen bg-slate-50">
-    <div className="max-w-3xl mx-auto px-6 py-12">
-      <h1 className="text-3xl font-bold text-slate-900 mb-4">Central de Suporte</h1>
-      <p className="text-slate-700 leading-relaxed">
-        Precisa de ajuda? Entre em contato com nosso suporte.
-      </p>
-      <div className="mt-6 space-y-2 text-slate-700">
-        <div>✉️ suporte@medicinajvs.com</div>
-        <div>💬 WhatsApp: (00) 00000-0000</div>
+  // Pega apenas estilos do <head> (style e links de CSS). Mantém a aparência original quando possível.
+  const headStyles = head
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
+    .match(/<(style|link)[^>]*>/gi)?.join("\n") || "";
+
+  const safeBody = body.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "");
+
+  return { headStyles, safeBody };
+};
+
+const PublicHtmlPage = ({ title, html }) => {
+  useEffect(() => {
+    document.body.classList.remove('dashboard-mode');
+    document.body.classList.remove('sidebar-expanded');
+    document.body.classList.add('login-mode');
+    return () => {};
+  }, []);
+
+  const { headStyles, safeBody } = extractFromHtml(html);
+
+  return (
+    <div className="min-h-screen bg-slate-50">
+      <style>{LoginCSS}</style>
+
+      {/* Estilos originais do HTML (quando existirem) */}
+      {headStyles ? (
+        <div dangerouslySetInnerHTML={{ __html: headStyles }} />
+      ) : null}
+
+      {/* Topbar simples */}
+      <div className="w-full bg-white border-b border-slate-200">
+        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+          <Link to="/login" className="flex items-center gap-3">
+            <div className="h-9 w-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold">M</div>
+            <div className="font-semibold text-slate-800">Medicina JVS</div>
+          </Link>
+
+          <Link to="/login" className="text-sm text-blue-700 hover:underline">
+            Voltar para o login
+          </Link>
+        </div>
       </div>
-      <div className="mt-8">
-        <a className="text-blue-600 hover:underline" href="/login">Voltar</a>
-      </div>
+
+      <main className="max-w-6xl mx-auto px-4 py-10">
+        <h1 className="text-3xl font-bold text-slate-900 mb-6">{title}</h1>
+
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <div className="p-6 md:p-10" dangerouslySetInnerHTML={{ __html: safeBody }} />
+        </div>
+      </main>
+
+      <Footer />
     </div>
-  </div>
-);
+  );
+};
+
+const PrivacyPage = () => <PublicHtmlPage title="Política de Privacidade" html={LEGAL_HTML.privacy} />;
+const TermsPage   = () => <PublicHtmlPage title="Termos de Uso" html={LEGAL_HTML.terms} />;
+const SupportPage = () => <PublicHtmlPage title="Central de Suporte" html={LEGAL_HTML.support} />;
+const CookiesPage = () => <PublicHtmlPage title="Política de Cookies" html={LEGAL_HTML.cookies} />;
 
 
 const PrivateRoute = ({ children, authReady, authUser }) => {
@@ -2884,9 +4186,10 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/verifique-email" element={<VerifyEmailPage authUser={authUser} />} />
 
-          <Route path="/privacidade" element={<PrivacyPage />} />
-          <Route path="/termos" element={<TermsPage />} />
-          <Route path="/suporte" element={<SupportPage />} />
+          <Route path="/privacidade" element={<ExternalRedirect to={`${INSTITUTIONAL_BASE}/politicaPrivacidade.html`} />} />
+          <Route path="/termos" element={<ExternalRedirect to={`${INSTITUTIONAL_BASE}/termosUso.html`} />} />
+          <Route path="/suporte" element={<ExternalRedirect to={`${INSTITUTIONAL_BASE}/suporte.html`} />} />
+          <Route path="/cookies" element={<ExternalRedirect to={`${INSTITUTIONAL_BASE}/cookies.html`} />} />
 
           <Route
             path="/"

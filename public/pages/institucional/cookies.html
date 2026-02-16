@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Política de Cookies | Medicina JVS</title>
+    <meta name="description" content="Política de Cookies da Medicina JVS. Saiba como utilizamos cookies.">
+    
+    <!-- Tailwind CSS (via CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Configurações de Fonte (Inter) -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .nav-link.active {
+            color: #2563eb;
+            border-left: 3px solid #2563eb;
+            background-color: #eff6ff;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-700 antialiased">
+
+    <!-- Cabeçalho -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="#" class="text-xl font-bold text-slate-900">
+                        <i class="fa-solid fa-cookie-bite text-blue-600 mr-2"></i>
+                        Medicina JVS
+                    </a>
+                </div>
+                
+                <!-- Navegação -->
+                <nav class="hidden md:flex space-x-8">
+                    <a href="home.html" class="text-slate-500 hover:text-blue-600 px-3 py-2 text-sm font-medium">Home</a>
+                    <a href="cookies.html" class="text-blue-600 px-3 py-2 text-sm font-medium border-b-2 border-blue-600">Cookies</a>
+                    <a href="politicaPrivacidade.html" class="text-slate-500 hover:text-blue-600 px-3 py-2 text-sm font-medium">Privacidade</a>
+                    <a href="termosUso.html" class="text-slate-500 hover:text-blue-600 px-3 py-2 text-sm font-medium">Termos de Uso</a>
+                    <a href="suporte.html" class="text-slate-500 hover:text-blue-600 px-3 py-2 text-sm font-medium">Suporte</a>
+                </nav>
+
+                <!-- Mobile Button -->
+                <div class="flex items-center md:hidden">
+                    <button type="button" class="text-slate-500 hover:text-slate-700 focus:outline-none">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <div class="bg-slate-800 text-white py-12">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold mb-4">Política de Cookies</h1>
+            <p class="text-slate-300 text-lg">Entenda o que são cookies e como você pode controlá-los.</p>
+            <p class="mt-4 text-sm text-slate-400">Última atualização: <span id="last-updated"></span></p>
+        </div>
+    </div>
+
+    <!-- Conteúdo Principal -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div class="flex flex-col md:flex-row gap-8">
+            
+            <!-- Menu Lateral -->
+            <aside class="md:w-1/4 hidden md:block">
+                <nav class="sticky top-24 bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="p-4 bg-slate-50 border-b border-slate-200 font-semibold text-slate-800">
+                        Navegação
+                    </div>
+                    <ul class="flex flex-col py-2">
+                        <li><a href="#o-que-sao" class="nav-link block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 border-l-3 border-transparent">1. O que são Cookies?</a></li>
+                        <li><a href="#como-usamos" class="nav-link block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 border-l-3 border-transparent">2. Como Usamos</a></li>
+                        <li><a href="#tipos" class="nav-link block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 border-l-3 border-transparent">3. Tipos de Cookies</a></li>
+                        <li><a href="#gerenciamento" class="nav-link block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 border-l-3 border-transparent">4. Gerenciamento</a></li>
+                        <li><a href="#alteracoes" class="nav-link block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 border-l-3 border-transparent">5. Alterações</a></li>
+                        <li><a href="#contato" class="nav-link block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 border-l-3 border-transparent">6. Contato</a></li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <!-- Artigo -->
+            <article class="md:w-3/4 bg-white p-8 rounded-lg shadow-sm border border-slate-200 leading-relaxed text-justify">
+                
+                <section id="o-que-sao" class="mb-10 scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">1. O que são Cookies?</h2>
+                    <p class="mb-4">
+                        Cookies são pequenos arquivos de texto que são baixados no seu computador, celular ou qualquer outro dispositivo quando você visita um site. Eles permitem que o site reconheça o seu dispositivo e armazene algumas informações sobre as suas preferências ou ações passadas.
+                    </p>
+                    <p>
+                        Os cookies não podem ser usados para executar programas ou enviar vírus para o seu computador.
+                    </p>
+                </section>
+
+                <section id="como-usamos" class="mb-10 scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">2. Como Usamos os Cookies</h2>
+                    <p class="mb-4">Utilizamos cookies por vários motivos, tais como:</p>
+                    <ul class="list-disc pl-6 space-y-2">
+                        <li>Para permitir o funcionamento correto do nosso site.</li>
+                        <li>Para melhorar a sua experiência de navegação (lembrando suas preferências).</li>
+                        <li>Para entender como os usuários utilizam o nosso site (análise de tráfego).</li>
+                        <li>Para fins de marketing e publicidade personalizada.</li>
+                    </ul>
+                </section>
+
+                <section id="tipos" class="mb-10 scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">3. Tipos de Cookies que Utilizamos</h2>
+                    
+                    <div class="space-y-6">
+                        <div class="bg-slate-50 p-4 rounded border border-slate-100">
+                            <h3 class="font-bold text-blue-900 mb-2">Cookies Estritamente Necessários</h3>
+                            <p class="text-sm">Esses cookies são essenciais para que você possa navegar pelo site e usar seus recursos, como acessar áreas seguras. Sem esses cookies, os serviços que você solicitou não podem ser fornecidos.</p>
+                        </div>
+
+                        <div class="bg-slate-50 p-4 rounded border border-slate-100">
+                            <h3 class="font-bold text-blue-900 mb-2">Cookies de Desempenho</h3>
+                            <p class="text-sm">Esses cookies coletam informações sobre como os visitantes usam um site, por exemplo, quais páginas os visitantes acessam com mais frequência. Toda informação que esses cookies coletam é agregada e, portanto, anônima.</p>
+                        </div>
+
+                        <div class="bg-slate-50 p-4 rounded border border-slate-100">
+                            <h3 class="font-bold text-blue-900 mb-2">Cookies de Funcionalidade</h3>
+                            <p class="text-sm">Permitem que o site se lembre das escolhas que você faz (como seu nome de usuário, idioma ou região) e forneça recursos aprimorados e mais pessoais.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="gerenciamento" class="mb-10 scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">4. Gerenciamento de Cookies</h2>
+                    <p class="mb-4">
+                        Você tem o direito de decidir se aceita ou rejeita cookies. Você pode definir ou alterar os controles do seu navegador da Web para aceitar ou recusar cookies.
+                    </p>
+                    <p class="mb-4">Veja como gerenciar cookies nos navegadores mais populares:</p>
+                    <div class="flex flex-wrap gap-3">
+                        <a href="https://support.google.com/chrome/answer/95647" target="_blank" class="px-3 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-sm">Google Chrome</a>
+                        <a href="https://support.mozilla.org/pt-BR/kb/ative-e-desative-os-cookies-que-os-sites-usam" target="_blank" class="px-3 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-sm">Mozilla Firefox</a>
+                        <a href="https://support.apple.com/pt-br/guide/safari/sfri11471/mac" target="_blank" class="px-3 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-sm">Apple Safari</a>
+                        <a href="https://support.microsoft.com/pt-br/microsoft-edge/excluir-cookies-no-microsoft-edge-63947406-40ac-c3b8-57b9-2a946a29ae09" target="_blank" class="px-3 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-sm">Microsoft Edge</a>
+                    </div>
+                </section>
+
+                <section id="alteracoes" class="mb-10 scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">5. Alterações nesta Política</h2>
+                    <p>
+                        Podemos atualizar esta Política de Cookies periodicamente para refletir, por exemplo, alterações nos cookies que usamos ou por outras razões operacionais, legais ou regulamentares. Por favor, visite esta Política de Cookies regularmente para se manter informado.
+                    </p>
+                </section>
+
+                <section id="contato" class="scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">6. Contato</h2>
+                    <p>Se você tiver alguma dúvida sobre nosso uso de cookies ou outras tecnologias, envie um e-mail para:</p>
+                    <p class="mt-2 font-semibold text-blue-600">privacidade@suaempresa.com</p>
+                </section>
+
+            </article>
+        </div>
+    </main>
+
+    <!-- Rodapé -->
+    <footer class="bg-slate-900 text-slate-300 py-12 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-white text-lg font-bold mb-4">Medicina JVS</h3>
+                    <p class="text-sm text-slate-400">Transparência e respeito com seus dados.</p>
+                </div>
+                <div>
+                    <h3 class="text-white text-lg font-bold mb-4">Links Rápidos</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="politicaPrivacidade.html" class="hover:text-white transition-colors">Política de Privacidade</a></li>
+                        <li><a href="termosUso.html" class="hover:text-white transition-colors">Termos de Uso</a></li>
+                        <li><a href="cookies.html" class="hover:text-white transition-colors text-white font-semibold">Política de Cookies</a></li>
+                        <li><a href="suporte.html" class="hover:text-white transition-colors">Suporte</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-white text-lg font-bold mb-4">Legal</h3>
+                    <p class="text-sm text-slate-400">CNPJ: 00.000.000/0001-00</p>
+                    <p class="text-sm text-slate-400 mt-2">&copy; <span id="current-year"></span> Todos os direitos reservados.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Botão Voltar ao Topo -->
+    <button id="backToTop" class="fixed bottom-8 right-8 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-all opacity-0 invisible z-50" title="Voltar ao topo">
+        <i class="fa-solid fa-arrow-up"></i>
+    </button>
+
+    <script>
+        const today = new Date();
+        document.getElementById('current-year').textContent = today.getFullYear();
+        const options = { day: 'numeric', month: 'long', year: 'numeric' };
+        document.getElementById('last-updated').textContent = today.toLocaleDateString('pt-BR', options);
+
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('.nav-link');
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (scrollY >= (sectionTop - 150)) current = section.getAttribute('id');
+            });
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').includes(current) && current !== '') link.classList.add('active');
+            });
+        });
+
+        const backToTopButton = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) backToTopButton.classList.remove('opacity-0', 'invisible');
+            else backToTopButton.classList.add('opacity-0', 'invisible');
+        });
+        backToTopButton.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>

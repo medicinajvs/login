@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Termos de Uso | Medicina JVS</title>
+    <meta name="description" content="Termos de Uso e Condições Gerais da Medicina JVS.">
+    
+    <!-- Tailwind CSS (via CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Configurações de Fonte (Inter) -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        /* Estilização da barra de rolagem */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Destaque do link ativo no menu lateral */
+        .nav-link.active {
+            color: #2563eb;
+            border-left: 3px solid #2563eb;
+            background-color: #eff6ff;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-700 antialiased">
+
+    <!-- Cabeçalho -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo / Nome da Empresa -->
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="#" class="text-xl font-bold text-slate-900">
+                        <i class="fa-solid fa-file-contract text-blue-600 mr-2"></i>
+                        Medicina JVS
+                    </a>
+                </div>
+                
+                <!-- Navegação Simples -->
+                <nav class="hidden md:flex space-x-8">
+                    <a href="home.html" class="text-slate-500 hover:text-blue-600 px-3 py-2 text-sm font-medium">Home</a>
+                    <a href="cookies.html" class="text-slate-500 hover:text-blue-600 px-3 py-2 text-sm font-medium">Cookies</a>
+                    <a href="politicaPrivacidade.html" class="text-slate-500 hover:text-blue-600 px-3 py-2 text-sm font-medium">Privacidade</a>
+                    <a href="termosUso.html" class="text-blue-600 px-3 py-2 text-sm font-medium border-b-2 border-blue-600">Termos de Uso</a>
+                    <a href="suporte.html" class="text-slate-500 hover:text-blue-600 px-3 py-2 text-sm font-medium">Suporte</a>
+                </nav>
+
+                <!-- Menu Mobile Button -->
+                <div class="flex items-center md:hidden">
+                    <button type="button" class="text-slate-500 hover:text-slate-700 focus:outline-none">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Cabeçalho do Documento -->
+    <div class="bg-slate-800 text-white py-12">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold mb-4">Termos de Uso</h1>
+            <p class="text-slate-300 text-lg">Regras e condições para a utilização dos nossos serviços.</p>
+            <p class="mt-4 text-sm text-slate-400">Última atualização: <span id="last-updated"></span></p>
+        </div>
+    </div>
+
+    <!-- Conteúdo Principal -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div class="flex flex-col md:flex-row gap-8">
+            
+            <!-- Menu Lateral (Sticky) -->
+            <aside class="md:w-1/4 hidden md:block">
+                <nav class="sticky top-24 bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="p-4 bg-slate-50 border-b border-slate-200 font-semibold text-slate-800">
+                        Índice
+                    </div>
+                    <ul class="flex flex-col py-2">
+                        <li><a href="#aceitacao" class="nav-link block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 border-l-3 border-transparent">1. Aceitação</a></li>
+                        <li><a href="#acesso" class="nav-link block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 border-l-3 border-transparent">2. Acesso e Cadastro</a></li>
+                        <li><a href="#obrigacoes" class="nav-link block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 border-l-3 border-transparent">3. Obrigações</a></li>
+                        <li><a href="#propriedade" class="nav-link block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 border-l-3 border-transparent">4. Propriedade Intelectual</a></li>
+                        <li><a href="#privacidade" class="nav-link block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 border-l-3 border-transparent">5. Privacidade</a></li>
+                        <li><a href="#isencao" class="nav-link block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 border-l-3 border-transparent">6. Isenção de Garantias</a></li>
+                        <li><a href="#alteracoes" class="nav-link block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 border-l-3 border-transparent">7. Alterações</a></li>
+                        <li><a href="#foro" class="nav-link block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 border-l-3 border-transparent">8. Foro</a></li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <!-- Texto do Documento -->
+            <article class="md:w-3/4 bg-white p-8 rounded-lg shadow-sm border border-slate-200 leading-relaxed text-justify">
+                
+                <!-- Seção 1 -->
+                <section id="aceitacao" class="mb-10 scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">1. Aceitação dos Termos</h2>
+                    <p class="mb-4">
+                        Bem-vindo à <strong>[Nome da Sua Empresa]</strong>. Ao acessar e utilizar nosso site, você concorda em cumprir e estar vinculado aos seguintes Termos de Uso. 
+                    </p>
+                    <p>
+                        Se você não concordar com qualquer parte destes termos, você não deve acessar ou utilizar nossos serviços. Estes Termos aplicam-se a todos os visitantes, usuários e outras pessoas que acessam ou usam o Serviço.
+                    </p>
+                </section>
+
+                <!-- Seção 2 -->
+                <section id="acesso" class="mb-10 scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">2. Acesso e Cadastro</h2>
+                    <p class="mb-4">Para acessar certos recursos do site, pode ser necessário que você forneça certas informações para criar uma conta ("Cadastro").</p>
+                    <ul class="list-disc pl-6 mb-4 space-y-2">
+                        <li>Você garante que as informações fornecidas são verdadeiras, precisas e completas.</li>
+                        <li>Você é responsável por manter a confidencialidade de sua senha e conta.</li>
+                        <li>Você concorda em nos notificar imediatamente sobre qualquer uso não autorizado de sua conta.</li>
+                    </ul>
+                </section>
+
+                <!-- Seção 3 -->
+                <section id="obrigacoes" class="mb-10 scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">3. Obrigações do Usuário</h2>
+                    <p class="mb-4">Ao utilizar nosso serviço, você concorda em não:</p>
+                    <div class="bg-red-50 p-4 rounded border border-red-100 text-red-800 text-sm">
+                        <ul class="list-disc pl-5 space-y-1">
+                            <li>Violar qualquer lei ou regulamento aplicável.</li>
+                            <li>Tentar interferir ou comprometer a integridade ou segurança do sistema.</li>
+                            <li>Enviar publicidade não solicitada (SPAM).</li>
+                            <li>Coletar dados de outros usuários sem consentimento.</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- Seção 4 -->
+                <section id="propriedade" class="mb-10 scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">4. Propriedade Intelectual</h2>
+                    <p class="mb-4">
+                        O Serviço e seu conteúdo original (excluindo Conteúdo fornecido por usuários), recursos e funcionalidades são e permanecerão de propriedade exclusiva da <strong>[Nome da Sua Empresa]</strong> e seus licenciadores.
+                    </p>
+                    <p>
+                        O Serviço é protegido por direitos autorais, marcas registradas e outras leis do Brasil e de outros países. Nossas marcas registradas não podem ser usadas em conexão com qualquer produto ou serviço sem o consentimento prévio por escrito.
+                    </p>
+                </section>
+
+                <!-- Seção 5 -->
+                <section id="privacidade" class="mb-10 scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">5. Privacidade</h2>
+                    <p>
+                        A sua privacidade é importante para nós. A utilização dos nossos serviços também é regida pela nossa <a href="politica_privacidade.html" class="text-blue-600 hover:underline font-semibold">Política de Privacidade</a>, que descreve como coletamos, usamos e compartilhamos suas informações.
+                    </p>
+                </section>
+
+                <!-- Seção 6 -->
+                <section id="isencao" class="mb-10 scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">6. Limitação de Responsabilidade</h2>
+                    <p class="mb-4">
+                        Em nenhum caso a <strong>[Nome da Sua Empresa]</strong>, nem seus diretores, funcionários, parceiros, agentes, fornecedores ou afiliados, serão responsáveis por quaisquer danos indiretos, incidentais, especiais, consequenciais ou punitivos, incluindo, sem limitação, perda de lucros, dados, uso, boa vontade ou outras perdas intangíveis.
+                    </p>
+                    <p class="text-sm text-slate-500 italic">
+                        O serviço é fornecido "no estado em que se encontra" e "conforme disponível", sem garantias de qualquer tipo.
+                    </p>
+                </section>
+
+                <!-- Seção 7 -->
+                <section id="alteracoes" class="mb-10 scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">7. Alterações nos Termos</h2>
+                    <p>
+                        Reservamo-nos o direito, a nosso exclusivo critério, de modificar ou substituir estes Termos a qualquer momento. Se uma revisão for material, tentaremos fornecer um aviso com pelo menos 30 dias de antecedência antes que quaisquer novos termos entrem em vigor. O que constitui uma mudança material será determinado a nosso exclusivo critério.
+                    </p>
+                </section>
+
+                <!-- Seção 8 -->
+                <section id="foro" class="scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">8. Legislação e Foro</h2>
+                    <p>
+                        Estes Termos serão regidos e interpretados de acordo com as leis do Brasil, sem levar em conta o conflito de provisões legais.
+                    </p>
+                    <p class="mt-2">
+                        Fica eleito o foro da comarca de <strong>[Sua Cidade/UF]</strong> para dirimir quaisquer dúvidas ou litígios oriundos deste termo, com renúncia expressa a qualquer outro, por mais privilegiado que seja.
+                    </p>
+                </section>
+
+            </article>
+        </div>
+    </main>
+
+    <!-- Rodapé -->
+    <footer class="bg-slate-900 text-slate-300 py-12 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-white text-lg font-bold mb-4">Medicina JVS</h3>
+                    <p class="text-sm text-slate-400">Excelência em serviços digitais.</p>
+                </div>
+                <div>
+                    <h3 class="text-white text-lg font-bold mb-4">Links Rápidos</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="politicaPrivacidade.html" class="hover:text-white transition-colors">Política de Privacidade</a></li>
+                        <li><a href="termosUso.html" class="hover:text-white transition-colors text-white font-semibold">Termos de Uso</a></li>
+                        <li><a href="cookies.html" class="hover:text-white transition-colors">Política de Cookies</a></li>
+                        <li><a href="suporte.html" class="hover:text-white transition-colors">Suporte</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-white text-lg font-bold mb-4">Legal</h3>
+                    <p class="text-sm text-slate-400">CNPJ: 00.000.000/0001-00</p>
+                    <p class="text-sm text-slate-400 mt-2">&copy; <span id="current-year"></span> Todos os direitos reservados.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Botão Voltar ao Topo -->
+    <button id="backToTop" class="fixed bottom-8 right-8 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-all opacity-0 invisible z-50" title="Voltar ao topo">
+        <i class="fa-solid fa-arrow-up"></i>
+    </button>
+
+    <!-- Scripts -->
+    <script>
+        // 1. Atualizar Ano e Data
+        const today = new Date();
+        document.getElementById('current-year').textContent = today.getFullYear();
+        const options = { day: 'numeric', month: 'long', year: 'numeric' };
+        document.getElementById('last-updated').textContent = today.toLocaleDateString('pt-BR', options);
+
+        // 2. Comportamento do Menu Lateral
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (scrollY >= (sectionTop - 150)) {
+                    current = section.getAttribute('id');
+                }
+            });
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').includes(current) && current !== '') {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // 3. Botão Voltar ao Topo
+        const backToTopButton = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTopButton.classList.remove('opacity-0', 'invisible');
+            } else {
+                backToTopButton.classList.add('opacity-0', 'invisible');
+            }
+        });
+        backToTopButton.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>
