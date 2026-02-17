@@ -32,6 +32,107 @@ function ExternalRedirect({ to, newTab = false }) {
 }
 
 
+
+
+
+function PublicHomePage() {
+  return (
+    <div className="min-h-screen bg-slate-50">
+      <style>{LoginCSS}</style>
+
+      {/* Topo público */}
+      <div className="w-full bg-white border-b border-slate-200">
+        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="h-9 w-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold">
+              M
+            </div>
+            <div className="font-semibold text-slate-800">Medicina JVS</div>
+          </div>
+
+          <Link to="/entrar" className="text-sm text-blue-700 hover:underline">
+            Entrar
+          </Link>
+        </div>
+      </div>
+
+      <main className="max-w-6xl mx-auto px-4 py-10">
+        <h1 className="text-3xl font-bold text-slate-900 mb-3">
+          Plataforma de estudos e organização para medicina
+        </h1>
+        <p className="text-slate-600 max-w-3xl">
+          Organize seus cursos, aulas, materiais e flashcards em um só lugar. Você também pode integrar sua agenda de
+          estudos com o Google Calendar para planejar revisões e compromissos.
+        </p>
+
+        <div className="mt-8 grid gap-4 md:grid-cols-2">
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+            <h2 className="text-lg font-semibold text-slate-900 mb-2">Integração com Google Calendar</h2>
+            <p className="text-slate-600 text-sm">
+              A integração permite que o usuário visualize e/ou crie eventos relacionados ao planejamento de estudos (por
+              exemplo: sessões de revisão, simulados e metas). Você pode revogar o acesso a qualquer momento nas
+              configurações da sua Conta Google.
+            </p>
+          </div>
+
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+            <h2 className="text-lg font-semibold text-slate-900 mb-2">Links institucionais</h2>
+            <p className="text-slate-600 text-sm">
+              Para mais detalhes sobre o app, consulte as páginas públicas abaixo:
+            </p>
+
+            <div className="mt-4 flex flex-wrap gap-3 text-sm">
+              <a
+                className="text-blue-700 hover:underline"
+                href={withBase(`${INSTITUTIONAL_BASE}/politicaPrivacidade.html`)}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Privacidade
+              </a>
+              <a
+                className="text-blue-700 hover:underline"
+                href={withBase(`${INSTITUTIONAL_BASE}/termosUso.html`)}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Termos
+              </a>
+              <a
+                className="text-blue-700 hover:underline"
+                href={withBase(`${INSTITUTIONAL_BASE}/suporte.html`)}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Suporte
+              </a>
+              <a
+                className="text-blue-700 hover:underline"
+                href={withBase(`${INSTITUTIONAL_BASE}/cookies.html`)}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Cookies
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-10">
+          <Link
+            to="/entrar"
+            className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-5 py-3 text-white font-semibold shadow-sm hover:bg-blue-700"
+          >
+            Acessar / Entrar
+          </Link>
+        </div>
+      </main>
+
+      <Footer />
+    </div>
+  );
+}
+
 // ✅ Para estas páginas serem EXTERNAS de verdade, coloque os HTMLs em:
 // public/pages/institucional/(politicaPrivacidade.html, termosUso.html, suporte.html, cookies.html)
 // (Arquivos dentro de src/ NÃO são servidos diretamente por URL no Vite.)
@@ -2055,7 +2156,7 @@ const LoginPage = () => {
               return;
           }
 
-          navigate('/', { replace: true });
+          navigate('/app', { replace: true });
       } catch (err) {
           const msg =
             err?.code === 'auth/invalid-credential' ? 'Email ou senha inválidos.' :
@@ -2104,7 +2205,7 @@ const LoginPage = () => {
               <div className="p-8">
                   <div className="mb-8 text-center">
                       <div className="mx-auto mb-4 h-12 w-12 rounded-2xl bg-blue-600 flex items-center justify-center text-white font-bold">M</div>
-                      <h1 className="text-2xl font-bold text-slate-900">Medicina JVS</h1>
+                      <h1 className="text-2xl font-bold text-slate-900">Acessar Plataforma</h1>
                       <p className="text-slate-500 mt-1">Entre com seu e-mail e senha</p>
                   </div>
 
@@ -2227,7 +2328,7 @@ const VerifyEmailPage = ({ authUser }) => {
     try {
       await authUser.reload();
       if (authUser.emailVerified) {
-        navigate('/', { replace: true });
+        navigate('/app', { replace: true });
       } else {
         showToastMessage('Ainda não consta como verificado. Atualize após confirmar no e-mail.', 'error');
       }
@@ -2238,7 +2339,7 @@ const VerifyEmailPage = ({ authUser }) => {
 
   const handleLogout = async () => {
     await signOut(auth);
-    navigate('/login', { replace: true });
+    navigate('/entrar', { replace: true });
   };
 
   return (
@@ -2362,7 +2463,7 @@ const Dashboard = ({ authUser, userData, setUserData, userRole, courses }) => {
     }
   };
 
-  const handleLogout = async (e) => { e.preventDefault(); await signOut(auth); navigate('/login', { replace: true }); };
+  const handleLogout = async (e) => { e.preventDefault(); await signOut(auth); navigate('/entrar', { replace: true }); };
   const handleSidebarHover = (isHovering) => setSidebarExpanded(isHovering);
     
   // Navegação Principal
@@ -2967,12 +3068,12 @@ const PublicHtmlPage = ({ title, html }) => {
       {/* Topbar simples */}
       <div className="w-full bg-white border-b border-slate-200">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to="/login" className="flex items-center gap-3">
+          <Link to="/entrar" className="flex items-center gap-3">
             <div className="h-9 w-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold">M</div>
             <div className="font-semibold text-slate-800">Medicina JVS</div>
           </Link>
 
-          <Link to="/login" className="text-sm text-blue-700 hover:underline">
+          <Link to="/entrar" className="text-sm text-blue-700 hover:underline">
             Voltar para o login
           </Link>
         </div>
@@ -3001,7 +3102,7 @@ const PrivateRoute = ({ children, authReady, authUser }) => {
   if (!authReady) {
     return <LoadingScreen label="Preparando sua sessão…" />;
   }
-  if (!authUser) return <Navigate to="/login" replace />;
+  if (!authUser) return <Navigate to="/entrar" replace />;
   if (!authUser.emailVerified) return <Navigate to="/verifique-email" replace />;
   return children;
 };
@@ -4183,16 +4284,25 @@ export default function App() {
       <style>{BaseCSS}</style>
       <BrowserRouter>
         <Routes>
-          <Route path="/login" element={<LoginPage />} />
+          {/* Página pública (homepage) */}
+          <Route path="/" element={<PublicHomePage />} />
+
+          {/* Login público */}
+          <Route path="/entrar" element={<LoginPage />} />
+          {/* Compatibilidade: rota antiga */}
+          <Route path="/login" element={<Navigate to="/entrar" replace />} />
+
           <Route path="/verifique-email" element={<VerifyEmailPage authUser={authUser} />} />
 
+          {/* Páginas institucionais externas */}
           <Route path="/privacidade" element={<ExternalRedirect to={`${INSTITUTIONAL_BASE}/politicaPrivacidade.html`} />} />
           <Route path="/termos" element={<ExternalRedirect to={`${INSTITUTIONAL_BASE}/termosUso.html`} />} />
           <Route path="/suporte" element={<ExternalRedirect to={`${INSTITUTIONAL_BASE}/suporte.html`} />} />
           <Route path="/cookies" element={<ExternalRedirect to={`${INSTITUTIONAL_BASE}/cookies.html`} />} />
 
+          {/* Área logada */}
           <Route
-            path="/"
+            path="/app"
             element={
               <PrivateRoute authReady={authReady} authUser={authUser}>
                 <Dashboard
@@ -4206,8 +4316,8 @@ export default function App() {
             }
           />
 
-          <Route path="*" element={<Navigate to="/login" replace />} />
-        </Routes>
+          <Route path="*" element={<Navigate to="/entrar" replace />} />
+        </Routes>>
       </BrowserRouter>
     </ErrorBoundary>
   );
