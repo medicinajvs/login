@@ -4317,7 +4317,7 @@ export default function App() {
           />
 
           <Route path="*" element={<Navigate to="/entrar" replace />} />
-        </Routes>>
+        </Routes>
       </BrowserRouter>
     </ErrorBoundary>
   );
